@@ -31,6 +31,7 @@ const onLoad = () => {
 };
 
 const onError = () => {
+    console.error("Image failed to load.");
     loading.value = false;
     error.value = true;
 };

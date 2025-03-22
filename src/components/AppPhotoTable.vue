@@ -1,21 +1,36 @@
 <template>
-    <div ref="scrollContainer" class="overflow-auto relative border border-gray-400 overflow-auto"
-        style="height: 600px; width: 600px;" v-infinite-scroll="loadMore"
-        infinite-scroll-disabled="isLoading || !hasMore" infinite-scroll-distance="10">
+<div ref="scrollContainer" class="overflow-auto relative border border-gray-400"
+    style="height: 600px; width: 600px;" 
+    v-infinite-scroll="loadMore"
+    :infinite-scroll-disabled="isLoading || !hasMore || isSorting || isInitialLoad"
+    infinite-scroll-distance="10">
         <table class="min-w-full table-auto border-collapse border border-gray-400">
             <thead class="table-header sticky top-0 shadow-md z-10 bg-blue-500">
-                <tr>
-                    <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
-                        @click="sortTable('id')">ID</th>
-                    <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
-                        @click="sortTable('albumId')">Альбом</th>
-                    <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
-                        @click="sortTable('title')">Название</th>
-                    <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
-                        @click="sortTable('url')">Ссылка</th>
-                    <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
-                        @click="sortTable('thumbnailUrl')">Миниатюра</th>
-                </tr>
+                <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
+                    @click="sortTable('id')"
+                    :class="{ 'bg-blue-300': sortColumn === 'id', 'bg-blue-200': sortColumn === 'id' && sortDirection === -1 }">
+                    ID
+                </th>
+                <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
+                    @click="sortTable('albumId')"
+                    :class="{ 'bg-blue-300': sortColumn === 'albumId', 'bg-blue-200': sortColumn === 'albumId' && sortDirection === -1 }">
+                    Альбом
+                </th>
+                <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
+                    @click="sortTable('title')"
+                    :class="{ 'bg-blue-300': sortColumn === 'title', 'bg-blue-200': sortColumn === 'title' && sortDirection === -1 }">
+                    Название
+                </th>
+                <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
+                    @click="sortTable('url')"
+                    :class="{ 'bg-blue-300': sortColumn === 'url', 'bg-blue-200': sortColumn === 'url' && sortDirection === -1 }">
+                    Ссылка
+                </th>
+                <th class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition"
+                    @click="sortTable('thumbnailUrl')"
+                    :class="{ 'bg-blue-300': sortColumn === 'thumbnailUrl', 'bg-blue-200': sortColumn === 'thumbnailUrl' && sortDirection === -1 }">
+                    Миниатюра
+                </th>
             </thead>
 
             <tbody v-if="photos.length">
@@ -24,12 +39,10 @@
                     </td>
                     <td class="p-2 text-center align-middle max-w-xs truncate border border-gray-300">{{ photo.albumId
                         }}</td>
-                    <td class="p-2 text-center align-middle text-cut border border-gray-300" :title="photo.title">
-                        {{ photo.title }}
-                    </td>
-                    <td class="p-2 text-center align-middle text-cut border border-gray-300" :title="photo.url">
-                        {{ photo.url }}
-                    </td>
+                    <td class="p-2 text-center align-middle text-cut border border-gray-300" :title="photo.title">{{
+                        photo.title }}</td>
+                    <td class="p-2 text-center align-middle text-cut border border-gray-300" :title="photo.url">{{
+                        photo.url }}</td>
                     <td class="p-2 text-center align-middle border border-gray-300 flex justify-center items-center">
                         <LazyImage :src="photo.thumbnailUrl" alt="thumbnail" class="w-16 h-16 rounded-md" />
                     </td>
@@ -62,7 +75,7 @@
             </tbody>
         </table>
         <p v-if="!photos.length && !isLoading" class="p-2 font-semibold empty-text absolute">
-            Список фотограффий пуст
+            Список фотографий пуст
         </p>
     </div>
 </template>
@@ -77,21 +90,33 @@ import LazyImage from './LazyImage.vue';
 
 const photoStore = usePhotoStore();
 const { photos, isLoading, hasMore } = storeToRefs(photoStore);
+const sortColumn = ref(null);
+const sortDirection = ref(1);
+const isSorting = ref(false); 
 
 const scrollContainer = ref(null);
 
 const sortTable = (column) => {
-    photoStore.photos.sort((a, b) => (a[column] > b[column] ? 1 : -1));
+    isSorting.value = true;
+    if (sortColumn.value === column) {
+        sortDirection.value *= -1;
+    } else {
+        sortColumn.value = column;
+        sortDirection.value = 1;
+    }
+
+    photoStore.photos.sort((a, b) => {
+        if (a[column] < b[column]) return -1 * sortDirection.value;
+        if (a[column] > b[column]) return 1 * sortDirection.value;
+        return 0;
+    });
+
+    isSorting.value = false;
 };
 
 const loadMore = () => {
-    if (!isLoading.value && hasMore.value) {
-        photoStore.loadMore();
-    }
-};
-
-const checkInitialScroll = () => {
-    if (photos.value.length === 0 && !isLoading.value && hasMore.value) {
+    console.log('ok');
+    if (!isLoading.value && hasMore.value && !isSorting.value) {  
         photoStore.loadMore();
     }
 };
@@ -100,7 +125,6 @@ onMounted(() => {
     useInfiniteScroll(scrollContainer, loadMore, { distance: 10 });
 });
 
-checkInitialScroll();
 </script>
 
 <style scoped>
@@ -111,8 +135,7 @@ checkInitialScroll();
     max-width: 160px;
 }
 
-.empty-text{
-
+.empty-text {
     margin-left: 50%;
     transform: translate(-50%, 100px);
 }
