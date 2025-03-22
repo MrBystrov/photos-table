@@ -21,7 +21,7 @@ export const usePhotoStore = defineStore("photoStore", () => {
       }
 
       queryParams.append("_page", page.value.toString());
-      queryParams.append("_limit", limit.toString()); // Устанавливаем лимит
+      queryParams.append("_limit", limit.toString()); 
 
       const response = await axios.get(
         `${BASE_URL}/photos?${queryParams.toString()}`
@@ -42,12 +42,11 @@ export const usePhotoStore = defineStore("photoStore", () => {
   const loadMore = () => {
     if (hasMore.value) {
       page.value += 1;
-      fetchPhotos(20); // Загружаем 20 строк при вызове loadMore
+      fetchPhotos(20); 
     }
   };
 
   const setSearchQuery = (query) => {
-    console.log("okk");
     searchQuery.value = query;
     page.value = 1;
     photos.value = [];

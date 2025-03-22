@@ -23,7 +23,6 @@ const photoStore = usePhotoStore();
 const { photos } = storeToRefs(photoStore)
 
 const onSearch = () => {
-    console.log('ok');
     photos.value = []
     console.log(photos.value); 
     photoStore.setSearchQuery(query.value);
