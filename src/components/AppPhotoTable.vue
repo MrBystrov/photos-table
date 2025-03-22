@@ -34,6 +34,11 @@
                         <LazyImage :src="photo.thumbnailUrl" alt="thumbnail" class="w-16 h-16 rounded-md" />
                     </td>
                 </tr>
+                <tr v-if="photos.length && isLoading">
+                    <td colspan="5" class="text-center py-4">
+                        <AppSpinner />
+                    </td>
+                </tr>
             </tbody>
 
             <tbody v-if="isLoading && !photos.length">
