@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <AppHeader />
-    <main class="items-center justify-center flex">
+    <main class="p-8">
+      <h1>Отчет по сделакам</h1>
       <AppPhotoTable />
     </main>
   </div>
@@ -12,25 +13,21 @@
 import { onMounted } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import AppPhotoTable from './components/AppPhotoTable.vue';
-import { usePhotoStore } from './stores/photoStore';
+import { useDealStore } from './stores/dealStore';
 
-const photoStore = usePhotoStore();
+const photoStore = useDealStore();
 const { fetchPhotos } = photoStore;
 
-onMounted(() => {
-  fetchPhotos()
-});
+
 </script>
 
 <style scoped>
   #app{
-    background-color: var(--background-color-light);
-    height: 100vh;
-    color: var(--text-color-light);
+    @apply bg-[var(--background-color-light)] h-screen text-[var(--text-color-light)];
+  
   }
   main{
-    display: flex;
-    height: calc(100vh - 75px);
+    @apply flex flex-col items-center h-[calc(100vh-75px)];
   }
 
 </style>

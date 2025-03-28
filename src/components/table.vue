@@ -1,23 +1,28 @@
-<template>
+
+
+            <template>
     <div ref="scrollContainer" class="overflow-auto relative border border-gray-400 w-full h-[calc(100%-300px)]"
         v-infinite-scroll="loadMore" :infinite-scroll-disabled="isLoading || !hasMore || isSorting || isInitialLoad"
         infinite-scroll-distance="10">
         <table class="min-w-full table-auto border-collapse border border-gray-400">
-            <thead v-if="isLoadingTitles" class="table-header sticky top-0 shadow-md z-10 bg-blue-400">
-                <th v-for="(title, key) in filtredTitles" :key="key">
+            <thead v-if="isLoadingTitles" class="table-header sticky top-0 shadow-md z-10 bg-blue-500">
+                <th v-for="(title, key) in filtredTitles" :key="key"
+                    class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition text-xs"
+                    @click="sortTable(key)"
+                    :class="{ 'bg-blue-300': sortColumn === key, 'bg-blue-200': sortColumn === key && sortDirection === -1 }">
                     <div class="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
                 </th>
             </thead>
-            <thead v-else class="table-header sticky top-0 shadow-md z-10 bg-blue-400">
+            <thead v-else class="table-header sticky top-0 shadow-md z-10 bg-blue-500">
                 <th v-for="(title, key) in filtredTitles" :key="key"
-                    class="cursor-pointer p-2 text-center border text-black border-gray-300 hover:bg-blue-300 transition text-xs"
+                    class="cursor-pointer p-2 text-center border border-gray-300 hover:bg-blue-400 transition text-xs"
                     @click="sortTable(key)"
                     :class="{ 'bg-blue-300': sortColumn === key, 'bg-blue-200': sortColumn === key && sortDirection === -1 }">
                     {{ title }}
                 </th>
             </thead>
 
-            <tbody v-if="fullCorrectedDeals.length" class="pt-8">
+            <tbody v-if="fullCorrectedDeals.length">
                 <tr v-for="deal in fullCorrectedDeals" :key="deal.ID" class="border-b border border-gray-300">
                     <td v-for="(title, key) in filtredTitles" :key="key" :title="deal[key]"
                         class="p-2 text-center align-middle max-w-xs truncate border border-gray-300 truncate max-w-[160px]">
@@ -25,15 +30,14 @@
                     </td>
                 </tr>
             </tbody>
-            <tbody v-if="isLoading">
-                <tr v-for="n in 15" :key="n" class="border-b w-full">
-                    <td v-for="(value, key) in filtredTitles" :key="key"
-                        class="p-2 text-center border border-gray-300 max-w-xs max-w-[160px]">
-                        <div class="h-6 w-12 bg-gray-300 animate-pulse rounded w-full"></div>
+        </table>
+        <tbody v-if="isLoading">
+                <tr v-for="n in 7" :key="n" class="border-b">
+                    <td v-for="(value, key) in filtredTitles" :key="key" class="p-2 text-center">
+                        <div class="h-6 w-12 bg-gray-300 animate-pulse rounded"></div>
                     </td>
                 </tr>
             </tbody>
-        </table>
         <p v-if="!fullCorrectedDeals.length && !isLoading"
             class="p-2 font-semibold empty-text ml-[50%] absolute transform-[translate(-50%, 100px)];">
             Список пуст
@@ -66,7 +70,7 @@ const sortTable = (column) => {
     }
 
     dealStore.allDeals.sort((a, b) => {
-        let aValue = a[column] ?? "";
+        let aValue = a[column] ?? ""; 
         let bValue = b[column] ?? "";
 
         if (aValue === "" && bValue !== "") return 1;

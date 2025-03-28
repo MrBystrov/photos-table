@@ -1,12 +1,14 @@
 <template>
     <button @click="toggleTheme"
-        class="p-4 bg-blue-500 text-white rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:bg-blue-600 active:bg-blue-700">
-        {{ currentTheme === 'light' ? 'Switch to dark' : 'Switch to light' }}
+        class="border-none cursor-pointer rounded-full  transition hover:shadow-yellow-400/50 hover:shadow-[0_0_15px_10px_rgba(0,0,0,0.3)]  active:bg-yellow-200">
+        <Sun v-if=" currentTheme==='light'" class="w-12 h-12 text-[var(--text-color-light)]" />
+        <Moon v-else class="w-12 h-12 text-[var(--text-color-light)]" />
     </button>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { Sun, Moon } from "lucide-vue-next";
 
 const currentTheme = ref('light');
 
@@ -29,19 +31,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.content {
-    padding: 20px;
-    text-align: center;
-}
-
-button {
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    color: var(--text-color-light);
-    border: 1px solid var(--background-color-dark);
-}
-
-</style>
+<style scoped></style>
